@@ -4,6 +4,22 @@
   box-sizing: border-box;
 }
 
+@keyframes fout {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fadeout {
+  animation-name: fout;
+  animation-duration: 200ms;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -24,12 +40,14 @@
   font-size: 6rem;
   line-height: 1.5em;
   color: antiquewhite;
+  user-select: none;
 }
 .label {
   font-family: "Alkalami", serif;
   font-size: 2.5rem;
   color: antiquewhite;
   text-align: center;
+  user-select: none;
 }
 .difficulty-wrapper {
   display: flex;
@@ -52,9 +70,16 @@
   transform: translate(-5px, -5px);
   box-shadow: 1px 1px 0 0 rgb(240, 225, 205), 2px 2px 0 0 rgb(230, 215, 195),
     3px 3px 0 0 rgb(220, 205, 185), 4px 4px 0 0 rgb(210, 195, 175),
-    5px 5px 0 0 rgb(200, 185, 165), 6px 6px 0 0 rgb(190, 175, 155);
+    5px 5px 0 0 rgb(200, 185, 165);
 }
 .diff-button:active {
   transform: initial;
   box-shadow: none;
+}
+.game-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }

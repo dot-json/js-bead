@@ -14,17 +14,23 @@
     <title>Document</title>
   </head>
   <body>
-    <div class="wrapper">
+    <div class="wrapper" id="mainwrapper">
       <div class="controls-wrapper">
         <span class="title">Játék indítása</span>
         <span class="label">Nehézség:</span>
-        <div class="difficulty-wrapper">
-          <button class="diff-button">Könnyű</button>
-          <button class="diff-button">Haladó</button>
-          <button class="diff-button">Extrém</button>
+        <div class="difficulty-wrapper" id="control-buttons">
+          <button class="diff-button" id="ctrl-btn" data-gamediff="easy">
+            Könnyű
+          </button>
+          <button class="diff-button" id="ctrl-btn" data-gamediff="hard">
+            Haladó
+          </button>
+          <button class="diff-button" id="ctrl-btn" data-gamediff="expert">
+            Extrém
+          </button>
         </div>
       </div>
-      <div class="game-area"></div>
+      <div class="game-area" id="gamearea"></div>
     </div>
   </body>
   <script src="index.js"></script>
