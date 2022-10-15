@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
+  background-color: #483434;
+}
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 38rem;
+  margin: 4rem 0;
+}
+.title {
+  font-family: "Alkalami", serif;
+  font-size: 6rem;
+  line-height: 1.5em;
+  color: antiquewhite;
+}
+.label {
+  font-family: "Alkalami", serif;
+  font-size: 2.5rem;
+  color: antiquewhite;
+  text-align: center;
+}
+.difficulty-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+}
+.diff-button {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 500;
+  font-size: 2rem;
+  padding: 0.8rem 1rem;
+  color: antiquewhite;
+  outline: none;
+  border: 2px solid antiquewhite;
+  background-color: #6f4445;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.diff-button:hover {
+  cursor: pointer;
+  transform: translate(-5px, -5px);
+  box-shadow: 1px 1px 0 0 rgb(240, 225, 205), 2px 2px 0 0 rgb(230, 215, 195),
+    3px 3px 0 0 rgb(220, 205, 185), 4px 4px 0 0 rgb(210, 195, 175),
+    5px 5px 0 0 rgb(200, 185, 165), 6px 6px 0 0 rgb(190, 175, 155);
+}
+.diff-button:active {
+  transform: initial;
+  box-shadow: none;
+}
