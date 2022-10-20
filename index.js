@@ -35,13 +35,17 @@ const givenTiles = {
 };
 
 const runGame = (mode) => {
+  title.classList.remove("fadeout");
+  label.classList.remove("fadeout");
+  title.classList.add("fadein");
+  label.classList.add("fadein");
   title.innerHTML = "Játék folyamatban";
   label.innerHTML = "Világítsd meg az összes zónát!";
 
   const grid = document.createElement("div");
-  grid.classList.add("grid");
+  grid.classList.add("grid", "fadein");
   const newgame = document.createElement("button");
-  newgame.classList.add("newgame-btn");
+  newgame.classList.add("newgame-btn", "fadein");
   newgame.innerHTML = "&#8635; Új játék";
   switch (mode) {
     case "easy":
@@ -102,17 +106,27 @@ const runGame = (mode) => {
       gamearea.removeChild(newgame);
       renderHome();
     }, "500");
+    title.classList.remove("fadein");
+    label.classList.remove("fadein");
+    title.classList.add("fadeout");
+    label.classList.add("fadeout");
+    grid.classList.remove("fadein");
     grid.classList.add("fadeout");
+    newgame.classList.remove("fadein");
     newgame.classList.add("fadeout");
   });
 };
 
 const renderHome = () => {
+  title.classList.remove("fadeout");
+  label.classList.remove("fadeout");
+  title.classList.add("fadein");
+  label.classList.add("fadein");
   title.innerHTML = "Játék indítása";
   label.innerHTML = "Nehézség:";
 
   let cpanel = document.createElement("div");
-  cpanel.classList.add("difficulty-wrapper");
+  cpanel.classList.add("difficulty-wrapper", "fadein");
   cpanel.id = "control-buttons";
 
   let btn1 = document.createElement("button");
@@ -137,7 +151,7 @@ const renderHome = () => {
   controls.addEventListener("mouseup", handleControls);
 
   const spritewrapper = document.createElement("div");
-  spritewrapper.classList.add("sprite-wrapper");
+  spritewrapper.classList.add("sprite-wrapper", "fadein");
   spritewrapper.id = "sprite-wrapper";
   const sprite = document.createElement("img");
   sprite.src = "public/castle.png";
@@ -156,7 +170,14 @@ const handleControls = (e) => {
       gamearea.removeChild(sprite);
       runGame(e.target.dataset.mode);
     }, "500");
+
+    title.classList.remove("fadein");
+    label.classList.remove("fadein");
+    title.classList.add("fadeout");
+    label.classList.add("fadeout");
+    panel.classList.remove("fadein");
     panel.classList.add("fadeout");
+    sprite.classList.remove("fadein");
     sprite.classList.add("fadeout");
     controls.removeEventListener("mouseup", handleControls);
   }

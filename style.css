@@ -4,12 +4,26 @@
   box-sizing: border-box;
 }
 
+/* ANIMATIONS */
 @keyframes fout {
   0% {
     opacity: 1;
+    scale: 1;
   }
   100% {
     opacity: 0;
+    scale: 0.8;
+  }
+}
+
+@keyframes fin {
+  0% {
+    opacity: 0;
+    scale: 0.8;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
   }
 }
 
@@ -20,6 +34,15 @@
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
+
+.fadein {
+  animation-name: fin;
+  animation-delay: 0;
+  animation-duration: 200ms;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+/* ANIMATIONS END */
 
 .wrapper {
   display: flex;
