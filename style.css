@@ -46,18 +46,33 @@
 
 .wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
   min-height: 100vh;
   align-items: center;
   background-color: #2e2b2b;
+}
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 0 auto;
+  width: 50%;
+  min-height: 48rem;
+  border-right: 1px solid rgba(250, 235, 215, 0.555);
+}
+.lb-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+  min-height: 48rem;
 }
 .controls-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 3rem;
 }
 .title {
   font-family: "Alkalami", serif;
@@ -116,7 +131,7 @@
   align-items: center;
   overflow: hidden;
   object-fit: contain;
-  padding: 1rem;
+  padding: 2rem;
   pointer-events: none;
   height: clamp(17rem, 30vw, 28rem);
 }
@@ -159,6 +174,49 @@
   background-color: antiquewhite;
   color: #423a37;
   transition: color 180ms ease, background-color 180ms ease;
+  cursor: pointer;
+}
+.lb-playeradd {
+  display: flex;
+  flex-direction: column;
+}
+.lb-title {
+  font-family: "Alkalami", serif;
+  font-size: 4rem;
+  line-height: 1.5em;
+  margin-top: 1.5rem;
+  color: #faead6;
+  user-select: none;
+}
+.lb-hor-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+.lb-input {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 500;
+  font-size: 1.7rem;
+  padding: 0 0.5rem;
+  color: antiquewhite;
+  width: 16rem;
+  height: 4rem;
+  outline: none;
+  border: 2px solid antiquewhite;
+  background-color: transparent;
+}
+.lb-button {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 500;
+  font-size: 1.5rem;
+  width: 5rem;
+  height: 4rem;
+  outline: none;
+  border: 2px solid antiquewhite;
+  border-left: none;
+  color: antiquewhite;
+  background-color: rgba(224, 210, 192, 0.21);
+}
+.lb-button:hover {
   cursor: pointer;
 }
 
