@@ -4,6 +4,15 @@ const label = document.querySelector("#label");
 const gamearea = document.querySelector("#gamearea");
 const controls = document.querySelector("#controls");
 
+const player_name = document.querySelector("#current-player");
+const player_button = document.querySelector("#player-btn");
+const player_remove_button = document.querySelector("#player-remove-btn");
+const player_input = document.querySelector("#profile-input");
+const gamelist = document.querySelector("#prev-games");
+
+const all_profiles = [];
+let current_profile = "";
+
 const givenTiles = {
   easy: [
     { id: 3, val: 1 },
@@ -31,22 +40,345 @@ const givenTiles = {
     { id: 44, val: -1 },
     { id: 46, val: 2 },
   ],
-  expert: [],
+  expert: [
+    { id: 1, val: -1 },
+    { id: 15, val: 3 },
+    { id: 17, val: 2 },
+    { id: 19, val: -1 },
+    { id: 21, val: 0 },
+    { id: 22, val: -1 },
+    { id: 27, val: -1 },
+    { id: 34, val: -1 },
+    { id: 41, val: 1 },
+    { id: 44, val: -1 },
+    { id: 45, val: 1 },
+    { id: 46, val: -1 },
+    { id: 53, val: -1 },
+    { id: 54, val: -1 },
+    { id: 55, val: -1 },
+    { id: 58, val: 3 },
+    { id: 65, val: -1 },
+    { id: 72, val: 1 },
+    { id: 77, val: 0 },
+    { id: 78, val: -1 },
+    { id: 80, val: 3 },
+    { id: 82, val: -1 },
+    { id: 84, val: 0 },
+    { id: 98, val: 0 },
+  ],
+};
+let bulbs = [];
+
+const fadeinElems = (...elems) => {
+  elems.map((e) => {
+    e.classList.remove("fadeout");
+    e.classList.add("fadein");
+  });
+};
+const fadeoutElems = (...elems) => {
+  elems.map((e) => {
+    e.classList.remove("fadein");
+    e.classList.add("fadeout");
+  });
+};
+
+function removeFromObj(arr, value) {
+  for (var i = arr.length - 1; i >= 0; --i) {
+    if (arr[i].row == value.row && arr[i].col == value.col) {
+      arr.splice(i, 1);
+    }
+  }
+}
+
+const getPos = (id, g_size) => {
+  return { row: Math.floor(id / g_size), col: id % g_size };
+};
+const getTile = (pos, size, grid) => {
+  return grid[pos.row * size + pos.col];
+};
+const getTileId = (grid_elems, tile) => {
+  return grid_elems.indexOf(tile);
+};
+
+const lightUp = (grid_elems, source, g_size) => {
+  // MIDDLE ---------------------------------------------------------
+  const middle = getTile(source, g_size, grid_elems);
+  middle.style.backgroundColor = "#fee06b40";
+  // ----------------------------------------------------------------
+  // VERTICAL DOWN --------------------------------------------------
+  for (let i = source.row + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+      current_tile.style.backgroundColor = "#fee06b40";
+    } else {
+      break;
+    }
+  }
+  //-----------------------------------------------------------------
+  // VERTICAL UP ----------------------------------------------------
+  for (let i = source.row - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+      current_tile.style.backgroundColor = "#fee06b40";
+    } else {
+      break;
+    }
+  }
+  //-----------------------------------------------------------------
+  //HORIZONTAL RIGHT ------------------------------------------------
+  for (let i = source.col + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+      current_tile.style.backgroundColor = "#fee06b40";
+    } else {
+      break;
+    }
+  }
+  //-----------------------------------------------------------------
+  //HORIZONTAL LEFT -------------------------------------------------
+  for (let i = source.col - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+      current_tile.style.backgroundColor = "#fee06b40";
+    } else {
+      break;
+    }
+  }
+  //-----------------------------------------------------------------
+};
+
+const lightOut = (grid_elems, source, g_size) => {
+  // MIDDLE ---------------------------------------------------------
+  const bulbs_in_col = bulbs.filter((e) => e.col == source.col);
+  const bulbs_in_row = bulbs.filter((e) => e.row == source.row);
+  const middle = getTile(source, g_size, grid_elems);
+  if (bulbs_in_col.length == 0 && bulbs_in_row.length == 0) {
+    middle.style.backgroundColor = "";
+  }
+  //-----------------------------------------------------------------
+  // VERTICAL DOWN --------------------------------------------------
+  for (let i = source.row + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (bulbs_in_col.length == 0) {
+      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+        const right =
+          source.col != g_size - 1
+            ? getTile({ row: i, col: source.col + 1 }, g_size, grid_elems)
+            : undefined;
+        const left =
+          source.col != 0
+            ? getTile({ row: i, col: source.col - 1 }, g_size, grid_elems)
+            : undefined;
+        if (
+          right != undefined &&
+          left != undefined &&
+          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
+          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          right == undefined &&
+          (left.style.backgroundColor != "rgba(254, 224, 107, 0.25)" ||
+            left.dataset.isWall == "true")
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          left == undefined &&
+          (right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" ||
+            right.dataset.isWall == "true")
+        ) {
+          current_tile.style.backgroundColor = "";
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  //-----------------------------------------------------------------
+  // VERTICAL UP ----------------------------------------------------
+  for (let i = source.row - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (bulbs_in_col.length == 0) {
+      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+        const right =
+          source.col != g_size - 1
+            ? getTile({ row: i, col: source.col + 1 }, g_size, grid_elems)
+            : undefined;
+        const left =
+          source.col != 0
+            ? getTile({ row: i, col: source.col - 1 }, g_size, grid_elems)
+            : undefined;
+        if (
+          right != undefined &&
+          left != undefined &&
+          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
+          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          right == undefined &&
+          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          left == undefined &&
+          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  //-----------------------------------------------------------------
+  //HORIZONTAL LEFT -------------------------------------------------
+  for (let i = source.col - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (bulbs_in_row.length == 0) {
+      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+        const top =
+          source.row != 0
+            ? getTile({ row: source.row - 1, col: i }, g_size, grid_elems)
+            : undefined;
+        const bot =
+          source.row != g_size - 1
+            ? getTile({ row: source.row + 1, col: i }, g_size, grid_elems)
+            : undefined;
+        if (
+          top != undefined &&
+          bot != undefined &&
+          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
+          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          top == undefined &&
+          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          bot == undefined &&
+          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  //-----------------------------------------------------------------
+  //HORIZONTAL RIGHT ------------------------------------------------
+  for (let i = source.col + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (bulbs_in_row.length == 0) {
+      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+        const top =
+          source.row != 0
+            ? getTile({ row: source.row - 1, col: i }, g_size, grid_elems)
+            : undefined;
+        const bot =
+          source.row != g_size - 1
+            ? getTile({ row: source.row + 1, col: i }, g_size, grid_elems)
+            : undefined;
+        if (
+          top != undefined &&
+          bot != undefined &&
+          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
+          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          top == undefined &&
+          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        } else if (
+          bot == undefined &&
+          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
+        ) {
+          current_tile.style.backgroundColor = "";
+        }
+      } else {
+        break;
+      }
+    }
+  }
+  //-----------------------------------------------------------------
+};
+
+const handleGameLogic = (e, grid, mode) => {
+  if (
+    e.target.id == "tile" &&
+    e.target.style.backgroundColor != "rgb(192, 181, 165)"
+  ) {
+    const grid_elems = [...grid.children];
+    let id = grid_elems.indexOf(e.target);
+    const g_size = Math.sqrt(grid.children.length);
+    const pos = getPos(id, g_size);
+
+    if (e.target.children.length == 0) {
+      let bulb = document.createElement("img");
+      bulb.style.pointerEvents = "none";
+      bulb.src = "public/bulb.svg";
+      e.target.appendChild(bulb);
+
+      bulbs.push(pos);
+      //---------------------------------------------
+      lightUp(grid_elems, pos, g_size);
+    } else if (e.target.id == "tile" && e.target.children.length != 0) {
+      removeFromObj(bulbs, pos);
+      lightOut(grid_elems, pos, g_size);
+      e.target.removeChild(e.target.firstChild);
+    }
+  }
 };
 
 const runGame = (mode) => {
-  title.classList.remove("fadeout");
-  label.classList.remove("fadeout");
-  title.classList.add("fadein");
-  label.classList.add("fadein");
+  fadeinElems(title, label);
   title.innerHTML = "Játék folyamatban";
   label.innerHTML = "Világítsd meg az összes zónát!";
-
+  bulbs = [];
   const grid = document.createElement("div");
-  grid.classList.add("grid", "fadein");
+  grid.classList.add("grid");
+  grid.id = "grid";
   const newgame = document.createElement("button");
-  newgame.classList.add("newgame-btn", "fadein");
+  newgame.classList.add("newgame-btn");
   newgame.innerHTML = "&#8635; Új játék";
+  fadeinElems(grid, newgame);
   switch (mode) {
     case "easy":
       grid.style.setProperty("--grid-rows", 7);
@@ -54,6 +386,8 @@ const runGame = (mode) => {
       for (let i = 0; i < 7 * 7; i++) {
         let tile = document.createElement("div");
         tile.classList.add("tile");
+        tile.id = "tile";
+        tile.dataset.isWall = "false";
         grid.appendChild(tile);
       }
       givenTiles.easy.map((e) => {
@@ -61,6 +395,7 @@ const runGame = (mode) => {
         if (e.val != -1) {
           grid.children[e.id].innerHTML = e.val;
         }
+        grid.children[e.id].dataset.isWall = "true";
       });
       gamearea.appendChild(grid);
       break;
@@ -70,6 +405,8 @@ const runGame = (mode) => {
       for (let i = 0; i < 7 * 7; i++) {
         let tile = document.createElement("div");
         tile.classList.add("tile");
+        tile.id = "tile";
+        tile.dataset.isWall = "false";
         grid.appendChild(tile);
       }
       givenTiles.hard.map((e) => {
@@ -77,6 +414,7 @@ const runGame = (mode) => {
         if (e.val != -1) {
           grid.children[e.id].innerHTML = e.val;
         }
+        grid.children[e.id].dataset.isWall = "true";
       });
       gamearea.appendChild(grid);
       break;
@@ -86,6 +424,8 @@ const runGame = (mode) => {
       for (let i = 0; i < 10 * 10; i++) {
         let tile = document.createElement("div");
         tile.classList.add("tile");
+        tile.id = "tile";
+        tile.dataset.isWall = "false";
         grid.appendChild(tile);
       }
       givenTiles.expert.map((e) => {
@@ -93,40 +433,35 @@ const runGame = (mode) => {
         if (e.val != -1) {
           grid.children[e.id].innerHTML = e.val;
         }
+        grid.children[e.id].dataset.isWall = "true";
       });
       gamearea.appendChild(grid);
       break;
   }
-  const tiles = grid.children;
 
   gamearea.appendChild(newgame);
   newgame.addEventListener("click", () => {
     setTimeout(() => {
+      grid.removeEventListener("click", (e) => {
+        handleGameLogic(e, grid, mode);
+      });
       gamearea.removeChild(grid);
       gamearea.removeChild(newgame);
       renderHome();
     }, "500");
-    title.classList.remove("fadein");
-    label.classList.remove("fadein");
-    title.classList.add("fadeout");
-    label.classList.add("fadeout");
-    grid.classList.remove("fadein");
-    grid.classList.add("fadeout");
-    newgame.classList.remove("fadein");
-    newgame.classList.add("fadeout");
+    fadeoutElems(title, label, grid, newgame);
+  });
+  grid.addEventListener("click", (e) => {
+    handleGameLogic(e, grid, mode);
   });
 };
 
 const renderHome = () => {
-  title.classList.remove("fadeout");
-  label.classList.remove("fadeout");
-  title.classList.add("fadein");
-  label.classList.add("fadein");
   title.innerHTML = "Játék indítása";
   label.innerHTML = "Nehézség:";
 
   let cpanel = document.createElement("div");
-  cpanel.classList.add("difficulty-wrapper", "fadein");
+  cpanel.classList.add("difficulty-wrapper");
   cpanel.id = "control-buttons";
 
   let btn1 = document.createElement("button");
@@ -151,7 +486,7 @@ const renderHome = () => {
   controls.addEventListener("mouseup", handleControls);
 
   const spritewrapper = document.createElement("div");
-  spritewrapper.classList.add("sprite-wrapper", "fadein");
+  spritewrapper.classList.add("sprite-wrapper");
   spritewrapper.id = "sprite-wrapper";
   const sprite = document.createElement("img");
   sprite.src = "public/castle.png";
@@ -159,6 +494,8 @@ const renderHome = () => {
   sprite.classList.add("sprite");
   spritewrapper.appendChild(sprite);
   gamearea.appendChild(spritewrapper);
+
+  fadeinElems(title, label, cpanel, spritewrapper);
 };
 
 const handleControls = (e) => {
@@ -171,16 +508,31 @@ const handleControls = (e) => {
       runGame(e.target.dataset.mode);
     }, "500");
 
-    title.classList.remove("fadein");
-    label.classList.remove("fadein");
-    title.classList.add("fadeout");
-    label.classList.add("fadeout");
-    panel.classList.remove("fadein");
-    panel.classList.add("fadeout");
-    sprite.classList.remove("fadein");
-    sprite.classList.add("fadeout");
+    fadeoutElems(title, label, panel, sprite);
     controls.removeEventListener("mouseup", handleControls);
   }
 };
 
+const handleProfileChange = () => {
+  if (player_input.value == "") {
+    return;
+  }
+  current_profile = player_input.value;
+  if (!all_profiles.includes(current_profile)) {
+    all_profiles.push(current_profile);
+  }
+  player_name.innerHTML = current_profile;
+  player_name.title = current_profile;
+};
+const handleProfileDeletion = () => {
+  if (current_profile == "") {
+    return;
+  }
+  current_profile = "";
+  player_name.innerHTML = "";
+  player_name.title = "";
+};
+
 controls.addEventListener("mouseup", handleControls);
+player_button.addEventListener("click", handleProfileChange);
+player_remove_button.addEventListener("click", handleProfileDeletion);

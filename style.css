@@ -3,6 +3,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+::selection {
+  background-color: #635e5e;
+}
 
 /* ANIMATIONS */
 @keyframes fout {
@@ -61,10 +64,10 @@
   min-height: 48rem;
   border-right: 1px solid rgba(250, 235, 215, 0.555);
 }
-.lb-wrapper {
+.gl-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 0 4rem;
   width: 50%;
   min-height: 48rem;
 }
@@ -152,11 +155,13 @@
   overflow: hidden;
   width: 3rem;
   height: 3rem;
+  padding: 0.5rem;
   border: 1px solid #c0b5a5;
   font-family: "Noto Sans", sans-serif;
   font-weight: 500;
   font-size: 1.6rem;
   user-select: none;
+  background-color: transparent;
 }
 .newgame-btn {
   font-family: "Noto Sans", sans-serif;
@@ -176,48 +181,112 @@
   transition: color 180ms ease, background-color 180ms ease;
   cursor: pointer;
 }
-.lb-playeradd {
-  display: flex;
-  flex-direction: column;
-}
-.lb-title {
+.gl-title {
   font-family: "Alkalami", serif;
-  font-size: 4rem;
+  font-size: 4.5rem;
   line-height: 1.5em;
-  margin-top: 1.5rem;
+  margin: 1.25rem 0;
   color: #faead6;
   user-select: none;
 }
-.lb-hor-wrapper {
+.gl-label {
+  font-family: "Alkalami", serif;
+  font-size: 2.8rem;
+  line-height: 1.2em;
+  margin: 4rem 0 1rem 0;
+  color: #faead6;
+  user-select: none;
+  border-bottom: 1px solid antiquewhite;
+}
+.gl-playername {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 3.35rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  color: #faead6;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 22rem;
+}
+.gl-hor-wrapper {
   display: flex;
   flex-direction: row;
 }
-.lb-input {
+.gl-vert-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-input {
   font-family: "Noto Sans", sans-serif;
   font-weight: 500;
-  font-size: 1.7rem;
+  font-size: 1.4rem;
   padding: 0 0.5rem;
   color: antiquewhite;
   width: 16rem;
-  height: 4rem;
+  height: 3.2rem;
   outline: none;
   border: 2px solid antiquewhite;
   background-color: transparent;
 }
-.lb-button {
+.profile-button {
   font-family: "Noto Sans", sans-serif;
-  font-weight: 500;
-  font-size: 1.5rem;
-  width: 5rem;
-  height: 4rem;
+  font-weight: 600;
+  font-size: 1.8rem;
+  line-height: 1em;
+  width: 4rem;
+  height: 3.2rem;
   outline: none;
   border: 2px solid antiquewhite;
   border-left: none;
   color: antiquewhite;
-  background-color: rgba(224, 210, 192, 0.21);
+  background-color: rgba(224, 210, 192, 0.15);
+  transition: background-color 200ms ease, color 200ms ease;
 }
-.lb-button:hover {
+.profile-button:hover {
   cursor: pointer;
+  color: #2e2b2b;
+  background-color: antiquewhite;
+}
+.profile-remove-button {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 1em;
+  width: 10rem;
+  height: 3.2rem;
+  margin-left: 1rem;
+  outline: none;
+  border: 2px solid antiquewhite;
+  color: antiquewhite;
+  background-color: rgba(224, 210, 192, 0.15);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+.profile-remove-button:hover {
+  cursor: pointer;
+  color: #2e2b2b;
+  background-color: antiquewhite;
+}
+.game-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 22rem;
+  padding-left: 0.5rem;
+  list-style-type: none;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.gl-entry {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 500;
+  font-size: 1.6rem;
+
+  color: #cabeae;
+}
+.gl-entry::before {
+  content: "\2684";
+  margin-right: 0.5rem;
 }
 
 @media screen and (max-width: 1200px) {
