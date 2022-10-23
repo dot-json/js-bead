@@ -99,6 +99,101 @@ const getTile = (pos, size, grid) => {
 const getTileId = (grid_elems, tile) => {
   return grid_elems.indexOf(tile);
 };
+const bulbInCol = (col) => {
+  let state = false;
+  bulbs.map((e) => {
+    if (e.col == col) {
+      state = true;
+    }
+  });
+  return state;
+};
+const bulbInRow = (row) => {
+  let state = false;
+  bulbs.map((e) => {
+    if (e.row == row) {
+      state = true;
+    }
+  });
+  return state;
+};
+
+const checkVUP = (grid_elems, source, g_size) => {
+  let state = true;
+  for (let i = source.row - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.dataset.isWall != "true") {
+      if (current_tile.dataset.isBulb == "true") {
+        state = false;
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return state;
+};
+const checkVDOWN = (grid_elems, source, g_size) => {
+  let state = true;
+  for (let i = source.row + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: i, col: source.col },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.dataset.isWall != "true") {
+      if (current_tile.dataset.isBulb == "true") {
+        state = false;
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return state;
+};
+const checkHLEFT = (grid_elems, source, g_size) => {
+  let state = true;
+  for (let i = source.col - 1; i >= 0; i--) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.dataset.isWall != "true") {
+      if (current_tile.dataset.isBulb == "true") {
+        state = false;
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return state;
+};
+const checkHRIGHT = (grid_elems, source, g_size) => {
+  let state = true;
+  for (let i = source.col + 1; i < g_size; i++) {
+    const current_tile = getTile(
+      { row: source.row, col: i },
+      g_size,
+      grid_elems
+    );
+    if (current_tile.dataset.isWall != "true") {
+      if (current_tile.dataset.isBulb == "true") {
+        state = false;
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return state;
+};
 
 const lightUp = (grid_elems, source, g_size) => {
   // MIDDLE ---------------------------------------------------------
@@ -163,15 +258,7 @@ const lightUp = (grid_elems, source, g_size) => {
   //-----------------------------------------------------------------
 };
 
-const lightOut = (grid_elems, source, g_size) => {
-  // MIDDLE ---------------------------------------------------------
-  const bulbs_in_col = bulbs.filter((e) => e.col == source.col);
-  const bulbs_in_row = bulbs.filter((e) => e.row == source.row);
-  const middle = getTile(source, g_size, grid_elems);
-  if (bulbs_in_col.length == 0 && bulbs_in_row.length == 0) {
-    middle.style.backgroundColor = "";
-  }
-  //-----------------------------------------------------------------
+const lightsOut = (grid_elems, source, g_size, mode) => {
   // VERTICAL DOWN --------------------------------------------------
   for (let i = source.row + 1; i < g_size; i++) {
     const current_tile = getTile(
@@ -179,39 +266,18 @@ const lightOut = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (bulbs_in_col.length == 0) {
-      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-        const right =
-          source.col != g_size - 1
-            ? getTile({ row: i, col: source.col + 1 }, g_size, grid_elems)
-            : undefined;
-        const left =
-          source.col != 0
-            ? getTile({ row: i, col: source.col - 1 }, g_size, grid_elems)
-            : undefined;
-        if (
-          right != undefined &&
-          left != undefined &&
-          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
-          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          right == undefined &&
-          (left.style.backgroundColor != "rgba(254, 224, 107, 0.25)" ||
-            left.dataset.isWall == "true")
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          left == undefined &&
-          (right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" ||
-            right.dataset.isWall == "true")
-        ) {
-          current_tile.style.backgroundColor = "";
-        }
-      } else {
-        break;
+    if (current_tile.dataset.isWall == "false") {
+      if (
+        current_tile.dataset.isBulb != "true" &&
+        checkVDOWN(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkVUP(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkHLEFT(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkHRIGHT(grid_elems, { row: i, col: source.col }, g_size)
+      ) {
+        current_tile.style.backgroundColor = "";
       }
+    } else {
+      break;
     }
   }
   //-----------------------------------------------------------------
@@ -222,37 +288,18 @@ const lightOut = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (bulbs_in_col.length == 0) {
-      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-        const right =
-          source.col != g_size - 1
-            ? getTile({ row: i, col: source.col + 1 }, g_size, grid_elems)
-            : undefined;
-        const left =
-          source.col != 0
-            ? getTile({ row: i, col: source.col - 1 }, g_size, grid_elems)
-            : undefined;
-        if (
-          right != undefined &&
-          left != undefined &&
-          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
-          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          right == undefined &&
-          left.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          left == undefined &&
-          right.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        }
-      } else {
-        break;
+    if (current_tile.dataset.isWall == "false") {
+      if (
+        current_tile.dataset.isBulb != "true" &&
+        checkVDOWN(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkVUP(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkHLEFT(grid_elems, { row: i, col: source.col }, g_size) &&
+        checkHRIGHT(grid_elems, { row: i, col: source.col }, g_size)
+      ) {
+        current_tile.style.backgroundColor = "";
       }
+    } else {
+      break;
     }
   }
   //-----------------------------------------------------------------
@@ -263,37 +310,18 @@ const lightOut = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (bulbs_in_row.length == 0) {
-      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-        const top =
-          source.row != 0
-            ? getTile({ row: source.row - 1, col: i }, g_size, grid_elems)
-            : undefined;
-        const bot =
-          source.row != g_size - 1
-            ? getTile({ row: source.row + 1, col: i }, g_size, grid_elems)
-            : undefined;
-        if (
-          top != undefined &&
-          bot != undefined &&
-          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
-          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          top == undefined &&
-          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          bot == undefined &&
-          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        }
-      } else {
-        break;
+    if (current_tile.dataset.isWall == "false") {
+      if (
+        current_tile.dataset.isBulb != "true" &&
+        checkVDOWN(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkVUP(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkHLEFT(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkHRIGHT(grid_elems, { row: source.row, col: i }, g_size)
+      ) {
+        current_tile.style.backgroundColor = "";
       }
+    } else {
+      break;
     }
   }
   //-----------------------------------------------------------------
@@ -304,38 +332,32 @@ const lightOut = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (bulbs_in_row.length == 0) {
-      if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-        const top =
-          source.row != 0
-            ? getTile({ row: source.row - 1, col: i }, g_size, grid_elems)
-            : undefined;
-        const bot =
-          source.row != g_size - 1
-            ? getTile({ row: source.row + 1, col: i }, g_size, grid_elems)
-            : undefined;
-        if (
-          top != undefined &&
-          bot != undefined &&
-          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)" &&
-          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          top == undefined &&
-          bot.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        } else if (
-          bot == undefined &&
-          top.style.backgroundColor != "rgba(254, 224, 107, 0.25)"
-        ) {
-          current_tile.style.backgroundColor = "";
-        }
-      } else {
-        break;
+    if (current_tile.dataset.isWall == "false") {
+      if (
+        current_tile.dataset.isBulb != "true" &&
+        checkVDOWN(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkVUP(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkHLEFT(grid_elems, { row: source.row, col: i }, g_size) &&
+        checkHRIGHT(grid_elems, { row: source.row, col: i }, g_size)
+      ) {
+        current_tile.style.backgroundColor = "";
       }
+    } else {
+      break;
     }
+  }
+  //-----------------------------------------------------------------
+  // MIDDLE ---------------------------------------------------------
+  const bulbs_in_col = bulbs.filter((e) => e.col == source.col);
+  const bulbs_in_row = bulbs.filter((e) => e.row == source.row);
+  const middle = getTile(source, g_size, grid_elems);
+  if (
+    checkVDOWN(grid_elems, { row: source.row, col: source.col }, g_size) &&
+    checkVUP(grid_elems, { row: source.row, col: source.col }, g_size) &&
+    checkHLEFT(grid_elems, { row: source.row, col: source.col }, g_size) &&
+    checkHRIGHT(grid_elems, { row: source.row, col: source.col }, g_size)
+  ) {
+    middle.style.backgroundColor = "";
   }
   //-----------------------------------------------------------------
 };
@@ -355,13 +377,14 @@ const handleGameLogic = (e, grid, mode) => {
       bulb.style.pointerEvents = "none";
       bulb.src = "public/bulb.svg";
       e.target.appendChild(bulb);
-
+      e.target.dataset.isBulb = "true";
       bulbs.push(pos);
       //---------------------------------------------
       lightUp(grid_elems, pos, g_size);
     } else if (e.target.id == "tile" && e.target.children.length != 0) {
+      e.target.dataset.isBulb = "false";
       removeFromObj(bulbs, pos);
-      lightOut(grid_elems, pos, g_size);
+      lightsOut(grid_elems, pos, g_size, mode);
       e.target.removeChild(e.target.firstChild);
     }
   }
@@ -388,6 +411,7 @@ const runGame = (mode) => {
         tile.classList.add("tile");
         tile.id = "tile";
         tile.dataset.isWall = "false";
+        tile.dataset.isBulb = "false";
         grid.appendChild(tile);
       }
       givenTiles.easy.map((e) => {
