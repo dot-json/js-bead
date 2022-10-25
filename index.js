@@ -117,6 +117,15 @@ const bulbInRow = (row) => {
   });
   return state;
 };
+function bulbAtPos(r, c) {
+  let state = false;
+  bulbs.map((e) => {
+    if (e.row == r && e.col == c) {
+      state = true;
+    }
+  });
+  return state;
+}
 
 const checkVUP = (grid_elems, source, g_size) => {
   let state = true;
@@ -362,6 +371,67 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
   //-----------------------------------------------------------------
 };
 
+function checkAround(grid_elems, id, g_size, max) {
+  if (max == -1) {
+    return true;
+  }
+
+  let amount = 0;
+  const mid = getPos(id, g_size);
+  if (
+    grid_elems[id - 1] != undefined &&
+    getPos(id - 1, g_size).col == mid.col - 1 &&
+    bulbAtPos(mid.row, mid.col - 1)
+  ) {
+    amount++;
+  }
+  if (
+    grid_elems[id + 1] != undefined &&
+    getPos(id + 1, g_size).col == mid.col + 1 &&
+    bulbAtPos(mid.row, mid.col + 1)
+  ) {
+    amount++;
+  }
+  if (
+    grid_elems[id - g_size] != undefined &&
+    getPos(id - g_size, g_size).row == mid.row - 1 &&
+    bulbAtPos(mid.row - 1, mid.col)
+  ) {
+    amount++;
+  }
+  if (
+    grid_elems[id + g_size] != undefined &&
+    getPos(id + g_size, g_size).row == mid.row + 1 &&
+    bulbAtPos(mid.row + 1, mid.col)
+  ) {
+    amount++;
+  }
+
+  return amount <= max;
+}
+
+function checkCompletion(grid_elems, mode, g_size) {
+  let state = true;
+  grid_elems.map((e) => {
+    if (e.style.backgroundColor == "") {
+      state = false;
+    }
+  });
+  // bulbs.map((e, i) => {
+  //   for (let j = 0; j < bulbs.length; j++) {
+  //     if (i != j && (e.col == bulbs[j].col || e.row == bulbs[j].row)) {
+  //       state = false;
+  //     }
+  //   }
+  // });
+  givenTiles[mode].map((e) => {
+    if (!checkAround(grid_elems, e.id, g_size, e.val)) {
+      state = false;
+    }
+  });
+  return state;
+}
+
 const handleGameLogic = (e, grid, mode) => {
   if (
     e.target.id == "tile" &&
@@ -387,6 +457,7 @@ const handleGameLogic = (e, grid, mode) => {
       lightsOut(grid_elems, pos, g_size, mode);
       e.target.removeChild(e.target.firstChild);
     }
+    checkCompletion(grid_elems, mode, g_size);
   }
 };
 
