@@ -185,7 +185,6 @@
   font-family: "Alkalami", serif;
   font-size: 4.5rem;
   line-height: 1.5em;
-  margin: 1.25rem 0;
   color: #faead6;
   user-select: none;
 }
@@ -202,7 +201,7 @@
   font-family: "Noto Sans", sans-serif;
   font-size: 3.35rem;
   font-weight: 500;
-  margin-top: 1.5rem;
+  margin-bottom: 1.8rem;
   color: #faead6;
   overflow: hidden;
   white-space: nowrap;
@@ -212,6 +211,8 @@
 .gl-hor-wrapper {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  margin: 1rem 0;
 }
 .gl-vert-wrapper {
   display: flex;
@@ -289,14 +290,60 @@
   margin-right: 0.5rem;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1800px) {
   .title {
-    font-size: 3.5rem;
+    font-size: clamp(3rem, 6vw, 6rem);
+  }
+  .gl-title {
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    margin-top: 2rem;
+  }
+  .gl-label {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+  }
+  .gl-playername {
+    font-size: clamp(2.2rem, 3.5vw, 3.35rem);
+    margin-top: 2rem;
   }
   .label {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
   .controls-wrapper {
     margin: 2rem 0 1rem 0;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .wrapper {
+    flex-direction: column;
+  }
+  .game-area {
+    margin: 2rem auto;
+  }
+  .game-wrapper {
+    border: none;
+    width: 100%;
+    max-width: 50rem;
+  }
+  .gl-wrapper {
+    width: 100%;
+    padding: 0 1rem;
+    max-width: 50rem;
+  }
+  .gl-playername {
+    margin-bottom: 1.25rem;
+  }
+  .sprite-wrapper {
+    height: 25rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .diff-button {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+  .difficulty-wrapper {
+    width: fit-content;
+    gap: 1rem;
   }
 }

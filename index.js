@@ -417,13 +417,16 @@ function checkCompletion(grid_elems, mode, g_size) {
       state = false;
     }
   });
-  // bulbs.map((e, i) => {
-  //   for (let j = 0; j < bulbs.length; j++) {
-  //     if (i != j && (e.col == bulbs[j].col || e.row == bulbs[j].row)) {
-  //       state = false;
-  //     }
-  //   }
-  // });
+  bulbs.map((e) => {
+    if (
+      !checkVDOWN(grid_elems, e, g_size) ||
+      !checkVUP(grid_elems, e, g_size) ||
+      !checkHLEFT(grid_elems, e, g_size) ||
+      !checkHRIGHT(grid_elems, e, g_size)
+    ) {
+      state = false;
+    }
+  });
   givenTiles[mode].map((e) => {
     if (!checkAround(grid_elems, e.id, g_size, e.val)) {
       state = false;
@@ -457,7 +460,9 @@ const handleGameLogic = (e, grid, mode) => {
       lightsOut(grid_elems, pos, g_size, mode);
       e.target.removeChild(e.target.firstChild);
     }
-    checkCompletion(grid_elems, mode, g_size);
+    if (checkCompletion(grid_elems, mode, g_size)) {
+      console.log("yo");
+    }
   }
 };
 
