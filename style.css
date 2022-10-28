@@ -204,9 +204,26 @@
   display: grid;
   grid-template-rows: repeat(var(--grid-rows), 1fr);
   grid-template-columns: repeat(var(--grid-cols), 1fr);
-
   border: 2px solid #c0b5a5;
 }
+.gametime {
+  font-family: "Noto Sans", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1em;
+  margin-bottom: 0.8rem;
+  color: antiquewhite;
+  user-select: none;
+}
+.gametime::before {
+  display: inline-block;
+  content: url("public/time.svg");
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.5rem;
+  transform: translateY(2px);
+}
+
 .tile {
   display: flex;
   justify-content: center;
@@ -221,6 +238,7 @@
   font-size: 1.6rem;
   user-select: none;
   background-color: transparent;
+  object-fit: cover;
 }
 .newgame-btn {
   font-family: "Noto Sans", sans-serif;
@@ -259,7 +277,7 @@
 .gl-playername {
   font-family: "Noto Sans", sans-serif;
   font-size: 3.35rem;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 1.8rem;
   color: #faead6;
   overflow: hidden;

@@ -12,6 +12,7 @@ const gamelist = document.querySelector("#prev-games");
 
 const all_profiles = [];
 let current_profile = "";
+let timerObj = null;
 let current_time = 0;
 
 const givenTiles = {
@@ -199,7 +200,7 @@ const lightUp = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+    if (current_tile.dataset.isWall == "false") {
       current_tile.style.animationDelay = `${iteration * 25}ms`;
       current_tile.classList.remove("lightsout");
       current_tile.classList.add("lightup");
@@ -217,7 +218,7 @@ const lightUp = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+    if (current_tile.dataset.isWall == "false") {
       current_tile.style.animationDelay = `${iteration * 25}ms`;
       current_tile.classList.remove("lightsout");
       current_tile.classList.add("lightup");
@@ -235,7 +236,7 @@ const lightUp = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+    if (current_tile.dataset.isWall == "false") {
       current_tile.style.animationDelay = `${iteration * 25}ms`;
       current_tile.classList.remove("lightsout");
       current_tile.classList.add("lightup");
@@ -253,7 +254,7 @@ const lightUp = (grid_elems, source, g_size) => {
       g_size,
       grid_elems
     );
-    if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
+    if (current_tile.dataset.isWall == "false") {
       current_tile.style.animationDelay = `${iteration * 25}ms`;
       current_tile.classList.remove("lightsout");
       current_tile.classList.add("lightup");
@@ -443,7 +444,7 @@ function checkCompletion(grid_elems, mode, g_size) {
   return state;
 }
 
-const renderDialog = (grid, newgame) => {
+const renderDialog = (grid, newgame, timer, time) => {
   const dialog = document.createElement("div");
   dialog.classList.add("dialog-wrapper", "dialogreveal");
   dialog.innerHTML = `
@@ -456,7 +457,7 @@ const renderDialog = (grid, newgame) => {
     <div class="dialog-content">
       <div class="dialog-time-box">
         <img src="public/time.svg" alt="watch" class="dialog-stopwatch" />
-        <span class="dialog-time">0:42</span>
+        <span class="dialog-time">${time}</span>
       </div>
       <button class="dialog-newgame" id="dialog-new">&#8635;</button>
     </div>
@@ -482,14 +483,43 @@ const renderDialog = (grid, newgame) => {
       setTimeout(() => {
         gamearea.removeChild(grid);
         gamearea.removeChild(newgame);
+        clearInterval(timerObj);
+        timerObj = null;
         renderHome();
       }, 200);
-      fadeoutElems(title, label, grid, newgame);
+      fadeoutElems(title, label, grid, newgame, timer);
     }, 200);
   });
 };
 
-const handleGameLogic = (e, grid, mode, newgame) => {
+const logGame = (time, mode) => {
+  let game = document.createElement("li");
+  game.classList.add("gl-entry");
+  game.innerHTML = `${
+    current_profile == "" ? "guest" : current_profile
+  } - mode: ${mode} - time: ${time}`;
+  gamelist.prepend(game);
+};
+
+const tickTimer = (timer) => {
+  if (current_time >= 3600) {
+    return;
+  }
+  current_time++;
+
+  let min = Math.floor(current_time / 60);
+  let sec = current_time % 60;
+
+  if (sec < 10) {
+    sec = "0" + sec;
+  }
+  if (min < 10) {
+    min = "0" + min;
+  }
+  timer.innerHTML = `${min}:${sec}`;
+};
+
+const handleGameLogic = (e, grid, mode, newgame, timer) => {
   if (
     e.target.id == "tile" &&
     e.target.style.backgroundColor != "rgb(192, 181, 165)"
@@ -502,6 +532,7 @@ const handleGameLogic = (e, grid, mode, newgame) => {
     if (e.target.children.length == 0) {
       let bulb = document.createElement("img");
       bulb.style.pointerEvents = "none";
+      bulb.style.height = "100%";
       bulb.src = "public/bulb.svg";
       e.target.appendChild(bulb);
       e.target.dataset.isBulb = "true";
@@ -515,7 +546,19 @@ const handleGameLogic = (e, grid, mode, newgame) => {
       e.target.removeChild(e.target.firstChild);
     }
     if (checkCompletion(grid_elems, mode, g_size)) {
-      renderDialog(grid, newgame);
+      let min = Math.floor(current_time / 60);
+      let sec = current_time % 60;
+      if (sec < 10) {
+        sec = "0" + sec;
+      }
+      if (min < 10) {
+        min = "0" + min;
+      }
+      let time = `${min}:${sec}`;
+      grid.style.pointerEvents = "none";
+      logGame(time, mode);
+      clearInterval(timerObj);
+      renderDialog(grid, newgame, timer, time);
     }
   }
 };
@@ -525,13 +568,21 @@ const runGame = (mode) => {
   title.innerHTML = "Játék folyamatban";
   label.innerHTML = "Világítsd meg az összes zónát!";
   bulbs = [];
+  current_time = 0;
+  if (timerObj) {
+    clearInterval(timerObj);
+    timerObj = null;
+  }
   const grid = document.createElement("div");
   grid.classList.add("grid");
   grid.id = "grid";
+  const gametime = document.createElement("span");
+  gametime.classList.add("gametime");
+  gametime.innerHTML = "00:00";
   const newgame = document.createElement("button");
   newgame.classList.add("newgame-btn");
   newgame.innerHTML = "&#8635; Új játék";
-  fadeinElems(grid, newgame);
+  fadeinElems(grid, newgame, gametime);
   switch (mode) {
     case "easy":
       grid.style.setProperty("--grid-rows", 7);
@@ -551,7 +602,13 @@ const runGame = (mode) => {
         }
         grid.children[e.id].dataset.isWall = "true";
       });
+      gamearea.appendChild(gametime);
       gamearea.appendChild(grid);
+      if (!timerObj) {
+        timerObj = setInterval(() => {
+          tickTimer(gametime);
+        }, 1000);
+      }
       break;
     case "hard":
       grid.style.setProperty("--grid-rows", 7);
@@ -570,7 +627,13 @@ const runGame = (mode) => {
         }
         grid.children[e.id].dataset.isWall = "true";
       });
+      gamearea.appendChild(gametime);
       gamearea.appendChild(grid);
+      if (!timerObj) {
+        timerObj = setInterval(() => {
+          tickTimer(gametime);
+        }, 1000);
+      }
       break;
     case "expert":
       grid.style.setProperty("--grid-rows", 10);
@@ -589,7 +652,13 @@ const runGame = (mode) => {
         }
         grid.children[e.id].dataset.isWall = "true";
       });
+      gamearea.appendChild(gametime);
       gamearea.appendChild(grid);
+      if (!timerObj) {
+        timerObj = setInterval(() => {
+          tickTimer(gametime);
+        }, 1000);
+      }
       break;
   }
 
@@ -597,17 +666,20 @@ const runGame = (mode) => {
   newgame.addEventListener("click", () => {
     setTimeout(() => {
       grid.removeEventListener("click", (e) => {
-        handleGameLogic(e, grid, mode);
+        handleGameLogic(e, grid, mode, gametime, gametime);
       });
       gamearea.removeChild(grid);
       gamearea.removeChild(newgame);
+      gamearea.removeChild(gametime);
+      clearInterval(timerObj);
+      timerObj = null;
       renderHome();
     }, "500");
-    fadeoutElems(title, label, grid, newgame);
+    fadeoutElems(title, label, grid, newgame, gametime);
   });
   checkCompletion([...grid.children], mode, Math.sqrt(grid.children.length));
   grid.addEventListener("click", (e) => {
-    handleGameLogic(e, grid, mode, newgame);
+    handleGameLogic(e, grid, mode, newgame, gametime);
   });
 };
 
