@@ -12,6 +12,7 @@ const gamelist = document.querySelector("#prev-games");
 
 const all_profiles = [];
 let current_profile = "";
+let current_time = 0;
 
 const givenTiles = {
   easy: [
@@ -96,27 +97,7 @@ const getPos = (id, g_size) => {
 const getTile = (pos, size, grid) => {
   return grid[pos.row * size + pos.col];
 };
-const getTileId = (grid_elems, tile) => {
-  return grid_elems.indexOf(tile);
-};
-const bulbInCol = (col) => {
-  let state = false;
-  bulbs.map((e) => {
-    if (e.col == col) {
-      state = true;
-    }
-  });
-  return state;
-};
-const bulbInRow = (row) => {
-  let state = false;
-  bulbs.map((e) => {
-    if (e.row == row) {
-      state = true;
-    }
-  });
-  return state;
-};
+
 function bulbAtPos(r, c) {
   let state = false;
   bulbs.map((e) => {
@@ -207,9 +188,11 @@ const checkHRIGHT = (grid_elems, source, g_size) => {
 const lightUp = (grid_elems, source, g_size) => {
   // MIDDLE ---------------------------------------------------------
   const middle = getTile(source, g_size, grid_elems);
-  middle.style.backgroundColor = "#fee06b40";
+  middle.classList.remove("lightsout");
+  middle.classList.add("lightup");
   // ----------------------------------------------------------------
   // VERTICAL DOWN --------------------------------------------------
+  let iteration = 0;
   for (let i = source.row + 1; i < g_size; i++) {
     const current_tile = getTile(
       { row: i, col: source.col },
@@ -217,13 +200,17 @@ const lightUp = (grid_elems, source, g_size) => {
       grid_elems
     );
     if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-      current_tile.style.backgroundColor = "#fee06b40";
+      current_tile.style.animationDelay = `${iteration * 25}ms`;
+      current_tile.classList.remove("lightsout");
+      current_tile.classList.add("lightup");
+      iteration++;
     } else {
       break;
     }
   }
   //-----------------------------------------------------------------
   // VERTICAL UP ----------------------------------------------------
+  iteration = 0;
   for (let i = source.row - 1; i >= 0; i--) {
     const current_tile = getTile(
       { row: i, col: source.col },
@@ -231,13 +218,17 @@ const lightUp = (grid_elems, source, g_size) => {
       grid_elems
     );
     if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-      current_tile.style.backgroundColor = "#fee06b40";
+      current_tile.style.animationDelay = `${iteration * 25}ms`;
+      current_tile.classList.remove("lightsout");
+      current_tile.classList.add("lightup");
+      iteration++;
     } else {
       break;
     }
   }
   //-----------------------------------------------------------------
   //HORIZONTAL RIGHT ------------------------------------------------
+  iteration = 0;
   for (let i = source.col + 1; i < g_size; i++) {
     const current_tile = getTile(
       { row: source.row, col: i },
@@ -245,13 +236,17 @@ const lightUp = (grid_elems, source, g_size) => {
       grid_elems
     );
     if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-      current_tile.style.backgroundColor = "#fee06b40";
+      current_tile.style.animationDelay = `${iteration * 25}ms`;
+      current_tile.classList.remove("lightsout");
+      current_tile.classList.add("lightup");
+      iteration++;
     } else {
       break;
     }
   }
   //-----------------------------------------------------------------
   //HORIZONTAL LEFT -------------------------------------------------
+  iteration = 0;
   for (let i = source.col - 1; i >= 0; i--) {
     const current_tile = getTile(
       { row: source.row, col: i },
@@ -259,7 +254,10 @@ const lightUp = (grid_elems, source, g_size) => {
       grid_elems
     );
     if (current_tile.style.backgroundColor != "rgb(192, 181, 165)") {
-      current_tile.style.backgroundColor = "#fee06b40";
+      current_tile.style.animationDelay = `${iteration * 25}ms`;
+      current_tile.classList.remove("lightsout");
+      current_tile.classList.add("lightup");
+      iteration++;
     } else {
       break;
     }
@@ -267,7 +265,7 @@ const lightUp = (grid_elems, source, g_size) => {
   //-----------------------------------------------------------------
 };
 
-const lightsOut = (grid_elems, source, g_size, mode) => {
+const lightsOut = (grid_elems, source, g_size) => {
   // VERTICAL DOWN --------------------------------------------------
   for (let i = source.row + 1; i < g_size; i++) {
     const current_tile = getTile(
@@ -283,7 +281,9 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
         checkHLEFT(grid_elems, { row: i, col: source.col }, g_size) &&
         checkHRIGHT(grid_elems, { row: i, col: source.col }, g_size)
       ) {
-        current_tile.style.backgroundColor = "";
+        current_tile.style.animationDelay = `0ms`;
+        current_tile.classList.add("lightsout");
+        current_tile.classList.remove("lightup");
       }
     } else {
       break;
@@ -305,7 +305,9 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
         checkHLEFT(grid_elems, { row: i, col: source.col }, g_size) &&
         checkHRIGHT(grid_elems, { row: i, col: source.col }, g_size)
       ) {
-        current_tile.style.backgroundColor = "";
+        current_tile.style.animationDelay = `0ms`;
+        current_tile.classList.add("lightsout");
+        current_tile.classList.remove("lightup");
       }
     } else {
       break;
@@ -327,7 +329,9 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
         checkHLEFT(grid_elems, { row: source.row, col: i }, g_size) &&
         checkHRIGHT(grid_elems, { row: source.row, col: i }, g_size)
       ) {
-        current_tile.style.backgroundColor = "";
+        current_tile.style.animationDelay = `0ms`;
+        current_tile.classList.add("lightsout");
+        current_tile.classList.remove("lightup");
       }
     } else {
       break;
@@ -349,7 +353,9 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
         checkHLEFT(grid_elems, { row: source.row, col: i }, g_size) &&
         checkHRIGHT(grid_elems, { row: source.row, col: i }, g_size)
       ) {
-        current_tile.style.backgroundColor = "";
+        current_tile.style.animationDelay = `0ms`;
+        current_tile.classList.add("lightsout");
+        current_tile.classList.remove("lightup");
       }
     } else {
       break;
@@ -357,8 +363,6 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
   }
   //-----------------------------------------------------------------
   // MIDDLE ---------------------------------------------------------
-  const bulbs_in_col = bulbs.filter((e) => e.col == source.col);
-  const bulbs_in_row = bulbs.filter((e) => e.row == source.row);
   const middle = getTile(source, g_size, grid_elems);
   if (
     checkVDOWN(grid_elems, { row: source.row, col: source.col }, g_size) &&
@@ -366,16 +370,13 @@ const lightsOut = (grid_elems, source, g_size, mode) => {
     checkHLEFT(grid_elems, { row: source.row, col: source.col }, g_size) &&
     checkHRIGHT(grid_elems, { row: source.row, col: source.col }, g_size)
   ) {
-    middle.style.backgroundColor = "";
+    middle.classList.remove("lightup");
+    middle.classList.add("lightsout");
   }
   //-----------------------------------------------------------------
 };
 
-function checkAround(grid_elems, id, g_size, max) {
-  if (max == -1) {
-    return true;
-  }
-
+function checkAround(grid_elems, id, g_size) {
   let amount = 0;
   const mid = getPos(id, g_size);
   if (
@@ -407,13 +408,13 @@ function checkAround(grid_elems, id, g_size, max) {
     amount++;
   }
 
-  return amount <= max;
+  return amount;
 }
 
 function checkCompletion(grid_elems, mode, g_size) {
   let state = true;
   grid_elems.map((e) => {
-    if (e.style.backgroundColor == "") {
+    if (e.dataset.isWall == "false" && !e.classList.contains("lightup")) {
       state = false;
     }
   });
@@ -428,14 +429,67 @@ function checkCompletion(grid_elems, mode, g_size) {
     }
   });
   givenTiles[mode].map((e) => {
-    if (!checkAround(grid_elems, e.id, g_size, e.val)) {
-      state = false;
+    if (e.val != -1) {
+      if (checkAround(grid_elems, e.id, g_size, e.val) == e.val) {
+        getTile(getPos(e.id, g_size), g_size, grid_elems).style.color =
+          "#249232";
+      } else {
+        state = false;
+        getTile(getPos(e.id, g_size), g_size, grid_elems).style.color =
+          "#ff392e";
+      }
     }
   });
   return state;
 }
 
-const handleGameLogic = (e, grid, mode) => {
+const renderDialog = (grid, newgame) => {
+  const dialog = document.createElement("div");
+  dialog.classList.add("dialog-wrapper", "dialogreveal");
+  dialog.innerHTML = `
+  <canvas class="canv" id="confetti-canvas"></canvas>
+  <div class="dialog-box">
+    <div class="dialog-topbar">
+      <span class="dialog-title">Grat</span>
+      <div class="dialog-close" id="dialog-close"></div>
+    </div>
+    <div class="dialog-content">
+      <div class="dialog-time-box">
+        <img src="public/time.svg" alt="watch" class="dialog-stopwatch" />
+        <span class="dialog-time">0:42</span>
+      </div>
+      <button class="dialog-newgame" id="dialog-new">&#8635;</button>
+    </div>
+  </div>`;
+  document.body.appendChild(dialog);
+  let confetti = new ConfettiGenerator({ target: "confetti-canvas" });
+  confetti.render();
+  const close = document.querySelector("#dialog-close");
+  const dialog_newgame = document.querySelector("#dialog-new");
+
+  close.addEventListener("click", () => {
+    dialog.classList.remove("dialogreveal");
+    dialog.classList.add("dialogclose");
+    setTimeout(() => {
+      dialog.parentElement.removeChild(dialog);
+    }, 200);
+  });
+  dialog_newgame.addEventListener("click", () => {
+    dialog.classList.remove("dialogreveal");
+    dialog.classList.add("dialogclose");
+    setTimeout(() => {
+      dialog.parentElement.removeChild(dialog);
+      setTimeout(() => {
+        gamearea.removeChild(grid);
+        gamearea.removeChild(newgame);
+        renderHome();
+      }, 200);
+      fadeoutElems(title, label, grid, newgame);
+    }, 200);
+  });
+};
+
+const handleGameLogic = (e, grid, mode, newgame) => {
   if (
     e.target.id == "tile" &&
     e.target.style.backgroundColor != "rgb(192, 181, 165)"
@@ -457,11 +511,11 @@ const handleGameLogic = (e, grid, mode) => {
     } else if (e.target.id == "tile" && e.target.children.length != 0) {
       e.target.dataset.isBulb = "false";
       removeFromObj(bulbs, pos);
-      lightsOut(grid_elems, pos, g_size, mode);
+      lightsOut(grid_elems, pos, g_size);
       e.target.removeChild(e.target.firstChild);
     }
     if (checkCompletion(grid_elems, mode, g_size)) {
-      console.log("yo");
+      renderDialog(grid, newgame);
     }
   }
 };
@@ -551,8 +605,9 @@ const runGame = (mode) => {
     }, "500");
     fadeoutElems(title, label, grid, newgame);
   });
+  checkCompletion([...grid.children], mode, Math.sqrt(grid.children.length));
   grid.addEventListener("click", (e) => {
-    handleGameLogic(e, grid, mode);
+    handleGameLogic(e, grid, mode, newgame);
   });
 };
 
