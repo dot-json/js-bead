@@ -493,6 +493,7 @@ const renderDialog = (grid, newgame, timer, time) => {
       setTimeout(() => {
         gamearea.removeChild(grid);
         gamearea.removeChild(newgame);
+        gamearea.removeChild(timer);
         clearInterval(timerObj);
         timerObj = null;
         renderHome();
@@ -680,7 +681,7 @@ const runGame = (mode) => {
   newgame.addEventListener("click", () => {
     setTimeout(() => {
       grid.removeEventListener("click", (e) => {
-        handleGameLogic(e, grid, mode, gametime, gametime);
+        handleGameLogic(e, grid, mode, newgame, gametime);
       });
       gamearea.removeChild(grid);
       gamearea.removeChild(newgame);
