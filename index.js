@@ -71,6 +71,7 @@ const givenTiles = {
 };
 let bulbs = [];
 
+//kollektiv fadelés funkciók
 const fadeinElems = (...elems) => {
   elems.map((e) => {
     e.classList.remove("fadeout");
@@ -83,6 +84,7 @@ const fadeoutElems = (...elems) => {
     e.classList.add("fadeout");
   });
 };
+//-------------------------
 
 function removeFromObj(arr, value) {
   for (var i = arr.length - 1; i >= 0; --i) {
@@ -92,13 +94,13 @@ function removeFromObj(arr, value) {
   }
 }
 
+//check segédek
 const getPos = (id, g_size) => {
   return { row: Math.floor(id / g_size), col: id % g_size };
 };
 const getTile = (pos, size, grid) => {
   return grid[pos.row * size + pos.col];
 };
-
 function bulbAtPos(r, c) {
   let state = false;
   bulbs.map((e) => {
@@ -108,7 +110,9 @@ function bulbAtPos(r, c) {
   });
   return state;
 }
+//--------------
 
+//raytracing segédek
 const checkVUP = (grid_elems, source, g_size) => {
   let state = true;
   for (let i = source.row - 1; i >= 0; i--) {
@@ -185,7 +189,9 @@ const checkHRIGHT = (grid_elems, source, g_size) => {
   }
   return state;
 };
+//------------------------
 
+//kivilágitás - 4 irányban minden mezőt további 4 irányban checkel
 const lightUp = (grid_elems, source, g_size) => {
   // MIDDLE ---------------------------------------------------------
   const middle = getTile(source, g_size, grid_elems);
@@ -266,6 +272,7 @@ const lightUp = (grid_elems, source, g_size) => {
   //-----------------------------------------------------------------
 };
 
+//hasonló logikával lekapcsol
 const lightsOut = (grid_elems, source, g_size) => {
   // VERTICAL DOWN --------------------------------------------------
   for (let i = source.row + 1; i < g_size; i++) {
@@ -377,6 +384,7 @@ const lightsOut = (grid_elems, source, g_size) => {
   //-----------------------------------------------------------------
 };
 
+//falak körüli villanyokat számolja
 function checkAround(grid_elems, id, g_size) {
   let amount = 0;
   const mid = getPos(id, g_size);
@@ -412,6 +420,7 @@ function checkAround(grid_elems, id, g_size) {
   return amount;
 }
 
+//ellenőrzi a készséget
 function checkCompletion(grid_elems, mode, g_size) {
   let state = true;
   grid_elems.map((e) => {
@@ -444,6 +453,7 @@ function checkCompletion(grid_elems, mode, g_size) {
   return state;
 }
 
+//megjelenitjuk a játék végi dialógust
 const renderDialog = (grid, newgame, timer, time) => {
   const dialog = document.createElement("div");
   dialog.classList.add("dialog-wrapper", "dialogreveal");
@@ -492,15 +502,17 @@ const renderDialog = (grid, newgame, timer, time) => {
   });
 };
 
+//a kör végén logoljuk az eredményt
 const logGame = (time, mode) => {
   let game = document.createElement("li");
   game.classList.add("gl-entry");
   game.innerHTML = `${
     current_profile == "" ? "guest" : current_profile
-  } - mode: ${mode} - time: ${time}`;
+  } - [mode: ${mode}] - [time: ${time}]`;
   gamelist.prepend(game);
 };
 
+//időzitő callback
 const tickTimer = (timer) => {
   if (current_time >= 3600) {
     return;
@@ -519,6 +531,7 @@ const tickTimer = (timer) => {
   timer.innerHTML = `${min}:${sec}`;
 };
 
+//minden grid-click eventnél alkalmazzuk a játékmenet logikáját
 const handleGameLogic = (e, grid, mode, newgame, timer) => {
   if (
     e.target.id == "tile" &&
@@ -563,6 +576,7 @@ const handleGameLogic = (e, grid, mode, newgame, timer) => {
   }
 };
 
+//előkésziti a játékteret majd elinditja a játékot
 const runGame = (mode) => {
   fadeinElems(title, label);
   title.innerHTML = "Játék folyamatban";
@@ -683,6 +697,7 @@ const runGame = (mode) => {
   });
 };
 
+//előkésziti majd megjeleniti a homescreent
 const renderHome = () => {
   title.innerHTML = "Játék indítása";
   label.innerHTML = "Nehézség:";
@@ -725,6 +740,7 @@ const renderHome = () => {
   fadeinElems(title, label, cpanel, spritewrapper);
 };
 
+//módválasztás
 const handleControls = (e) => {
   if (e.target.matches("button")) {
     const panel = document.querySelector("#control-buttons");
@@ -740,6 +756,7 @@ const handleControls = (e) => {
   }
 };
 
+//profilválasztás
 const handleProfileChange = () => {
   if (player_input.value == "") {
     return;
