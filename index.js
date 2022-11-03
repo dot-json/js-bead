@@ -427,6 +427,9 @@ function checkCompletion(grid_elems, mode, g_size) {
     if (e.dataset.isWall == "false" && !e.classList.contains("lightup")) {
       state = false;
     }
+    if (e.children.length == 0 && e.classList.contains("redlight")) {
+      e.classList.remove("redlight");
+    }
   });
   bulbs.map((e) => {
     if (
@@ -435,7 +438,10 @@ function checkCompletion(grid_elems, mode, g_size) {
       !checkHLEFT(grid_elems, e, g_size) ||
       !checkHRIGHT(grid_elems, e, g_size)
     ) {
+      getTile(e, g_size, grid_elems).classList.add("redlight");
       state = false;
+    } else {
+      getTile(e, g_size, grid_elems).classList.remove("redlight");
     }
   });
   givenTiles[mode].map((e) => {
@@ -507,9 +513,10 @@ const renderDialog = (grid, newgame, timer, time) => {
 const logGame = (time, mode) => {
   let game = document.createElement("li");
   game.classList.add("gl-entry");
-  game.innerHTML = `${
+  game.innerHTML = `[player: ${
     current_profile == "" ? "guest" : current_profile
-  } - [mode: ${mode}] - [time: ${time}]`;
+  }] - [mode: ${mode}] - [time: ${time}]`;
+  game.title = game.innerHTML;
   gamelist.prepend(game);
 };
 
@@ -582,6 +589,9 @@ const runGame = (mode) => {
   fadeinElems(title, label);
   title.innerHTML = "Játék folyamatban";
   label.innerHTML = "Világítsd meg az összes zónát!";
+  player_input.disabled = true;
+  player_button.disabled = true;
+  player_remove_button.disabled = true;
   bulbs = [];
   current_time = 0;
   if (timerObj) {
@@ -702,6 +712,9 @@ const runGame = (mode) => {
 const renderHome = () => {
   title.innerHTML = "Játék indítása";
   label.innerHTML = "Nehézség:";
+  player_input.disabled = false;
+  player_button.disabled = false;
+  player_remove_button.disabled = false;
 
   let cpanel = document.createElement("div");
   cpanel.classList.add("difficulty-wrapper");
@@ -760,6 +773,11 @@ const handleControls = (e) => {
 //profilválasztás
 const handleProfileChange = () => {
   if (player_input.value == "") {
+    alert("A név nem lehet üres!");
+    return;
+  }
+  if (player_input.value == "guest") {
+    alert("A guest név nem választható!");
     return;
   }
   current_profile = player_input.value;
