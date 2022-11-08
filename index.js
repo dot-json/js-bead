@@ -467,7 +467,7 @@ const renderDialog = (grid, newgame, timer, time) => {
   <canvas class="canv" id="confetti-canvas"></canvas>
   <div class="dialog-box">
     <div class="dialog-topbar">
-      <span class="dialog-title">Grat</span>
+      <span class="dialog-title">Yo</span>
       <div class="dialog-close" id="dialog-close"></div>
     </div>
     <div class="dialog-content">
@@ -509,8 +509,39 @@ const renderDialog = (grid, newgame, timer, time) => {
   });
 };
 
+const loadPrevScores = () => {
+  let stored_games = JSON.parse(window.localStorage.getItem("prev_games"));
+  if (stored_games != null) {
+    stored_games.map((e) => {
+      let game = document.createElement("li");
+      game.classList.add("gl-entry");
+      game.innerHTML = `[player: ${e.name}] - [mode: ${e.mode}] - [time: ${e.time}]`;
+      game.title = game.innerHTML;
+      gamelist.prepend(game);
+    });
+  }
+};
+
 //a kör végén logoljuk az eredményt
 const logGame = (time, mode) => {
+  let stored_games = JSON.parse(window.localStorage.getItem("prev_games"));
+  if (stored_games == null) {
+    let games = [];
+    games.push({
+      name: current_profile == "" ? "guest" : current_profile,
+      mode: mode,
+      time: time,
+    });
+    stored_games = games;
+    window.localStorage.setItem("prev_games", JSON.stringify(stored_games));
+  } else {
+    stored_games.push({
+      name: current_profile == "" ? "guest" : current_profile,
+      mode: mode,
+      time: time,
+    });
+    window.localStorage.setItem("prev_games", JSON.stringify(stored_games));
+  }
   let game = document.createElement("li");
   game.classList.add("gl-entry");
   game.innerHTML = `[player: ${
@@ -795,6 +826,8 @@ const handleProfileDeletion = () => {
   player_name.innerHTML = "";
   player_name.title = "";
 };
+
+loadPrevScores();
 
 controls.addEventListener("mouseup", handleControls);
 player_button.addEventListener("click", handleProfileChange);

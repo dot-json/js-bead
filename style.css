@@ -351,10 +351,11 @@
   display: flex;
   flex-direction: column;
   max-height: 22rem;
+  flex-grow: 1;
   padding-left: 0.5rem;
   list-style-type: none;
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 .gl-entry {
   max-width: 100%;

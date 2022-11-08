@@ -27,7 +27,7 @@ A fegyelmi vétség legsúlyosabb következménye a hallgató elbocsátása az e
 [X] Játéktér: külön stílussal (pl. piros szín vagy ikon) jelenik meg, ha két villanykörte egymást megvilágítja (1 pont)
 [ ] Játéktér: a játék menet közben megszakítható és menthető (1 pont)
 [X] Pályaválasztó: láthatók a legutóbbi játékok eredményei: játékos neve, pálya neve, teljesítés ideje (1 pont)
-[ ] Pályaválasztó: a legutóbbi játékok eredményei megmaradnak az oldal bezárása után is (1 pont)
+[X] Pályaválasztó: a legutóbbi játékok eredményei megmaradnak az oldal bezárása után is (1 pont)
 [ ] Pályaválasztó: a pályaválasztó oldalon látszik, ha van mentett játék, és ez a játék helyesen betölthető (1 pont)
 [X] Egyéb: igényes kialakítás (1 pont)
 
