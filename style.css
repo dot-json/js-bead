@@ -242,19 +242,20 @@
 .redlight {
   background-color: #ff392eaa !important;
 }
-.newgame-btn {
+.game-btn {
   font-family: "Noto Sans", sans-serif;
   font-weight: 500;
   font-size: 1.4rem;
   padding: 0.6rem 0.8rem;
   margin-top: 3rem;
+  margin-right: 1rem;
   color: antiquewhite;
   outline: none;
   border: 2px solid antiquewhite;
   background-color: #423a37;
   transition: color 180ms ease, background-color 180ms ease;
 }
-.newgame-btn:hover {
+.game-btn:hover {
   background-color: antiquewhite;
   color: #423a37;
   transition: color 180ms ease, background-color 180ms ease;
@@ -287,13 +288,13 @@
   text-overflow: ellipsis;
   max-width: 21rem;
 }
-.gl-hor-wrapper {
+.hor-wrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 1rem 0;
 }
-.gl-vert-wrapper {
+.vert-wrapper {
   display: flex;
   flex-direction: column;
 }
@@ -479,6 +480,40 @@
   color: #423a37;
   transition: color 180ms ease, background-color 180ms ease;
   cursor: pointer;
+}
+.notification {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translate(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 30rem;
+  height: 4rem;
+  padding: 0 1rem;
+  background-color: #444040;
+  border: 1px solid antiquewhite;
+}
+.noti-text {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: antiquewhite;
+}
+.noti-button {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  color: antiquewhite;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+.noti-button:hover {
+  text-decoration: 2px underline;
 }
 
 @media screen and (max-width: 1800px) {

@@ -25,10 +25,10 @@ A fegyelmi vétség legsúlyosabb következménye a hallgató elbocsátása az e
 [X] Játéktér: a fény terjedése animációval történik, vagyis látható, hogy milyen sorrendben kapnak sárga háttérszínt az egyes cellák a villanykörtétől távolodva (1 pont)
 [X] Játéktér: külön stílussal (pl. zöld szövegszín) jelenik meg, ha egy fekete cellát a beleírt számnak megfelelő számú villanykörte határol (1 pont)
 [X] Játéktér: külön stílussal (pl. piros szín vagy ikon) jelenik meg, ha két villanykörte egymást megvilágítja (1 pont)
-[ ] Játéktér: a játék menet közben megszakítható és menthető (1 pont)
+[X] Játéktér: a játék menet közben megszakítható és menthető (1 pont)
 [X] Pályaválasztó: láthatók a legutóbbi játékok eredményei: játékos neve, pálya neve, teljesítés ideje (1 pont)
 [X] Pályaválasztó: a legutóbbi játékok eredményei megmaradnak az oldal bezárása után is (1 pont)
-[ ] Pályaválasztó: a pályaválasztó oldalon látszik, ha van mentett játék, és ez a játék helyesen betölthető (1 pont)
+[X] Pályaválasztó: a pályaválasztó oldalon látszik, ha van mentett játék, és ez a játék helyesen betölthető (1 pont)
 [X] Egyéb: igényes kialakítás (1 pont)
 
 [ ] Szerkesztő: saját pályák létrehozhatók tetszőleges méretben és kiinduló mezőkkel (3 pont)

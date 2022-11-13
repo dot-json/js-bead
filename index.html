@@ -38,15 +38,15 @@
         </div>
       </div>
       <div class="gl-wrapper" class="glwrapper">
-        <div class="gl-vert-wrapper" id="glplayermenu">
-          <div class="gl-hor-wrapper">
+        <div class="vert-wrapper" id="glplayermenu">
+          <div class="hor-wrapper">
             <span class="gl-title" style="margin-right: 1rem"
               >Aktiv profil:</span
             >
             <span class="gl-playername" id="current-player"></span>
           </div>
 
-          <div class="gl-hor-wrapper">
+          <div class="hor-wrapper">
             <input
               type="text"
               class="profile-input"
@@ -60,7 +60,7 @@
             </button>
           </div>
         </div>
-        <div class="gl-vert-wrapper" style="flex-grow: 1;">
+        <div class="vert-wrapper" style="flex-grow: 1;">
           <span class="gl-label">Eddigi játékok</span>
           <ul id="prev-games" class="game-list">
             
@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-      
+      <div class="notification" id="notification" style="display: none;"><span class="noti-text">Játék folytatása?</span><div class="hor-wrapper"><button class="noti-button" id="noti-button-load">BETÖLTÉS</button> <button class="noti-button" id="noti-button-del">TÖRLÉS</button></div></div>
     </div>
   </body>
   <script src="index.js"></script>

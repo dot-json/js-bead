@@ -3,6 +3,9 @@ const title = document.querySelector("#title");
 const label = document.querySelector("#label");
 const gamearea = document.querySelector("#gamearea");
 const controls = document.querySelector("#controls");
+const notif = document.querySelector("#notification");
+const notif_button_load = document.querySelector("#noti-button-load");
+const notif_button_del = document.querySelector("#noti-button-del");
 
 const player_name = document.querySelector("#current-player");
 const player_button = document.querySelector("#player-btn");
@@ -460,7 +463,7 @@ function checkCompletion(grid_elems, mode, g_size) {
 }
 
 //megjelenitjuk a játék végi dialógust
-const renderDialog = (grid, newgame, timer, time) => {
+const renderDialog = (grid, btn_wrapper, timer, time) => {
   const dialog = document.createElement("div");
   dialog.classList.add("dialog-wrapper", "dialogreveal");
   dialog.innerHTML = `
@@ -498,15 +501,40 @@ const renderDialog = (grid, newgame, timer, time) => {
       dialog.parentElement.removeChild(dialog);
       setTimeout(() => {
         gamearea.removeChild(grid);
-        gamearea.removeChild(newgame);
+        gamearea.removeChild(btn_wrapper);
         gamearea.removeChild(timer);
         clearInterval(timerObj);
         timerObj = null;
         renderHome();
       }, 200);
-      fadeoutElems(title, label, grid, newgame, timer);
+      fadeoutElems(title, label, grid, btn_wrapper, timer);
     }, 200);
   });
+};
+
+const checkSave = () => {
+  let saved_game = JSON.parse(window.localStorage.getItem("saved_game"));
+  if (saved_game == null) return;
+  notif.style.display = "flex";
+};
+const handleLoadGame = () => {
+  notif.style.display = "none";
+  let saved_game = JSON.parse(window.localStorage.getItem("saved_game"));
+  current_profile = saved_game.player;
+  player_name.innerHTML = current_profile;
+  player_name.title = current_profile;
+  const panel = document.querySelector("#control-buttons");
+  const sprite = document.querySelector("#sprite-wrapper");
+  setTimeout(() => {
+    controls.removeChild(panel);
+    gamearea.removeChild(sprite);
+    runGame(null, saved_game);
+  }, "500");
+  fadeoutElems(title, label, panel, sprite);
+};
+const handleDelSave = () => {
+  window.localStorage.removeItem("saved_game");
+  notif.style.display = "none";
 };
 
 const loadPrevScores = () => {
@@ -551,6 +579,21 @@ const logGame = (time, mode) => {
   gamelist.prepend(game);
 };
 
+const serializeGame = (timerObj, grid, mode) => {
+  let saved_game = JSON.parse(window.localStorage.getItem("saved_game"));
+  if (saved_game != null) window.localStorage.removeItem("saved_game");
+  grid.classList.remove("fadein");
+  let save = {
+    timerObj: timerObj,
+    table: grid.innerHTML,
+    mode: mode,
+    bulbs: bulbs,
+    player: current_profile,
+  };
+  saved_game = save;
+  window.localStorage.setItem("saved_game", JSON.stringify(saved_game));
+};
+
 //időzitő callback
 const tickTimer = (timer) => {
   if (current_time >= 3600) {
@@ -571,7 +614,7 @@ const tickTimer = (timer) => {
 };
 
 //minden grid-click eventnél alkalmazzuk a játékmenet logikáját
-const handleGameLogic = (e, grid, mode, newgame, timer) => {
+const handleGameLogic = (e, grid, mode, btn_wrapper, timer) => {
   if (
     e.target.id == "tile" &&
     e.target.style.backgroundColor != "rgb(192, 181, 165)"
@@ -610,24 +653,32 @@ const handleGameLogic = (e, grid, mode, newgame, timer) => {
       grid.style.pointerEvents = "none";
       logGame(time, mode);
       clearInterval(timerObj);
-      renderDialog(grid, newgame, timer, time);
+      renderDialog(grid, btn_wrapper, timer, time);
     }
   }
 };
 
 //előkésziti a játékteret majd elinditja a játékot
-const runGame = (mode) => {
+const runGame = (mode, save) => {
+  let gamemode = mode;
   fadeinElems(title, label);
   title.innerHTML = "Játék folyamatban";
   label.innerHTML = "Világítsd meg az összes zónát!";
   player_input.disabled = true;
   player_button.disabled = true;
   player_remove_button.disabled = true;
-  bulbs = [];
+  if (save != null) {
+    bulbs = save.bulbs;
+  } else {
+    bulbs = [];
+  }
   current_time = 0;
   if (timerObj) {
     clearInterval(timerObj);
     timerObj = null;
+  }
+  if (save != null) {
+    timerObj = save.timerObj;
   }
   const grid = document.createElement("div");
   grid.classList.add("grid");
@@ -635,107 +686,159 @@ const runGame = (mode) => {
   const gametime = document.createElement("span");
   gametime.classList.add("gametime");
   gametime.innerHTML = "00:00";
+  const btn_wrapper = document.createElement("div");
   const newgame = document.createElement("button");
-  newgame.classList.add("newgame-btn");
+  const savegame = document.createElement("button");
+  btn_wrapper.classList.add("hor-wrapper");
+  newgame.classList.add("game-btn");
+  savegame.classList.add("game-btn");
   newgame.innerHTML = "&#8635; Új játék";
-  fadeinElems(grid, newgame, gametime);
-  switch (mode) {
-    case "easy":
-      grid.style.setProperty("--grid-rows", 7);
-      grid.style.setProperty("--grid-cols", 7);
-      for (let i = 0; i < 7 * 7; i++) {
-        let tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.id = "tile";
-        tile.dataset.isWall = "false";
-        tile.dataset.isBulb = "false";
-        grid.appendChild(tile);
-      }
-      givenTiles.easy.map((e) => {
-        grid.children[e.id].style.backgroundColor = "#c0b5a5";
-        if (e.val != -1) {
-          grid.children[e.id].innerHTML = e.val;
+  savegame.innerHTML = "&#8595; Mentés";
+  fadeinElems(grid, btn_wrapper, gametime);
+
+  if (gamemode != null) {
+    switch (gamemode) {
+      case "easy":
+        grid.style.setProperty("--grid-rows", 7);
+        grid.style.setProperty("--grid-cols", 7);
+        for (let i = 0; i < 7 * 7; i++) {
+          let tile = document.createElement("div");
+          tile.classList.add("tile");
+          tile.id = "tile";
+          tile.dataset.isWall = "false";
+          tile.dataset.isBulb = "false";
+          grid.appendChild(tile);
         }
-        grid.children[e.id].dataset.isWall = "true";
-      });
-      gamearea.appendChild(gametime);
-      gamearea.appendChild(grid);
-      if (!timerObj) {
+        givenTiles.easy.map((e) => {
+          grid.children[e.id].style.backgroundColor = "#c0b5a5";
+          if (e.val != -1) {
+            grid.children[e.id].innerHTML = e.val;
+          }
+          grid.children[e.id].dataset.isWall = "true";
+        });
+        gamearea.appendChild(gametime);
+        gamearea.appendChild(grid);
+
         timerObj = setInterval(() => {
           tickTimer(gametime);
         }, 1000);
-      }
-      break;
-    case "hard":
-      grid.style.setProperty("--grid-rows", 7);
-      grid.style.setProperty("--grid-cols", 7);
-      for (let i = 0; i < 7 * 7; i++) {
-        let tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.id = "tile";
-        tile.dataset.isWall = "false";
-        grid.appendChild(tile);
-      }
-      givenTiles.hard.map((e) => {
-        grid.children[e.id].style.backgroundColor = "#c0b5a5";
-        if (e.val != -1) {
-          grid.children[e.id].innerHTML = e.val;
+
+        break;
+      case "hard":
+        grid.style.setProperty("--grid-rows", 7);
+        grid.style.setProperty("--grid-cols", 7);
+        for (let i = 0; i < 7 * 7; i++) {
+          let tile = document.createElement("div");
+          tile.classList.add("tile");
+          tile.id = "tile";
+          tile.dataset.isWall = "false";
+          grid.appendChild(tile);
         }
-        grid.children[e.id].dataset.isWall = "true";
-      });
-      gamearea.appendChild(gametime);
-      gamearea.appendChild(grid);
-      if (!timerObj) {
-        timerObj = setInterval(() => {
-          tickTimer(gametime);
-        }, 1000);
-      }
-      break;
-    case "expert":
-      grid.style.setProperty("--grid-rows", 10);
-      grid.style.setProperty("--grid-cols", 10);
-      for (let i = 0; i < 10 * 10; i++) {
-        let tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.id = "tile";
-        tile.dataset.isWall = "false";
-        grid.appendChild(tile);
-      }
-      givenTiles.expert.map((e) => {
-        grid.children[e.id].style.backgroundColor = "#c0b5a5";
-        if (e.val != -1) {
-          grid.children[e.id].innerHTML = e.val;
+        givenTiles.hard.map((e) => {
+          grid.children[e.id].style.backgroundColor = "#c0b5a5";
+          if (e.val != -1) {
+            grid.children[e.id].innerHTML = e.val;
+          }
+          grid.children[e.id].dataset.isWall = "true";
+        });
+        gamearea.appendChild(gametime);
+        gamearea.appendChild(grid);
+        if (!timerObj) {
+          timerObj = setInterval(() => {
+            tickTimer(gametime);
+          }, 1000);
         }
-        grid.children[e.id].dataset.isWall = "true";
-      });
-      gamearea.appendChild(gametime);
-      gamearea.appendChild(grid);
-      if (!timerObj) {
-        timerObj = setInterval(() => {
-          tickTimer(gametime);
-        }, 1000);
-      }
-      break;
+        break;
+      case "expert":
+        grid.style.setProperty("--grid-rows", 10);
+        grid.style.setProperty("--grid-cols", 10);
+        for (let i = 0; i < 10 * 10; i++) {
+          let tile = document.createElement("div");
+          tile.classList.add("tile");
+          tile.id = "tile";
+          tile.dataset.isWall = "false";
+          grid.appendChild(tile);
+        }
+        givenTiles.expert.map((e) => {
+          grid.children[e.id].style.backgroundColor = "#c0b5a5";
+          if (e.val != -1) {
+            grid.children[e.id].innerHTML = e.val;
+          }
+          grid.children[e.id].dataset.isWall = "true";
+        });
+        gamearea.appendChild(gametime);
+        gamearea.appendChild(grid);
+        if (!timerObj) {
+          timerObj = setInterval(() => {
+            tickTimer(gametime);
+          }, 1000);
+        }
+        break;
+    }
+  } else {
+    let size = 0;
+    switch (save.mode) {
+      case "easy":
+        size = 7;
+        break;
+      case "hard":
+        size = 7;
+        break;
+      case "expert":
+        size = 10;
+        break;
+    }
+    gamearea.appendChild(gametime);
+    grid.style.setProperty("--grid-rows", size);
+    grid.style.setProperty("--grid-cols", size);
+    grid.innerHTML = save.table;
+    gamearea.appendChild(grid);
+    current_time = timerObj;
+    gamemode = save.mode;
+    timerObj = setInterval(() => {
+      tickTimer(gametime);
+    }, 1000);
   }
 
-  gamearea.appendChild(newgame);
+  gamearea.appendChild(btn_wrapper);
+  btn_wrapper.appendChild(newgame);
+  btn_wrapper.appendChild(savegame);
   newgame.addEventListener("click", () => {
     setTimeout(() => {
       grid.removeEventListener("click", (e) => {
-        handleGameLogic(e, grid, mode, newgame, gametime);
+        handleGameLogic(e, grid, gamemode, btn_wrapper, gametime);
       });
       gamearea.removeChild(grid);
-      gamearea.removeChild(newgame);
+      gamearea.removeChild(btn_wrapper);
       gamearea.removeChild(gametime);
       clearInterval(timerObj);
       timerObj = null;
       renderHome();
     }, "500");
-    fadeoutElems(title, label, grid, newgame, gametime);
+    fadeoutElems(title, label, grid, btn_wrapper, gametime);
   });
-  checkCompletion([...grid.children], mode, Math.sqrt(grid.children.length));
+  savegame.addEventListener("click", () => {
+    serializeGame(timerObj, grid, gamemode);
+    setTimeout(() => {
+      grid.removeEventListener("click", (e) => {
+        handleGameLogic(e, grid, gamemode, btn_wrapper, gametime);
+      });
+      gamearea.removeChild(grid);
+      gamearea.removeChild(btn_wrapper);
+      gamearea.removeChild(gametime);
+      clearInterval(timerObj);
+      timerObj = null;
+      renderHome();
+    }, "500");
+    fadeoutElems(title, label, grid, btn_wrapper, gametime);
+  });
+  checkCompletion(
+    [...grid.children],
+    gamemode,
+    Math.sqrt(grid.children.length)
+  );
   grid.addEventListener("click", (e) => {
-    handleGameLogic(e, grid, mode, newgame, gametime);
+    handleGameLogic(e, grid, gamemode, btn_wrapper, gametime);
   });
 };
 
@@ -781,7 +884,7 @@ const renderHome = () => {
   sprite.classList.add("sprite");
   spritewrapper.appendChild(sprite);
   gamearea.appendChild(spritewrapper);
-
+  checkSave();
   fadeinElems(title, label, cpanel, spritewrapper);
 };
 
@@ -793,7 +896,7 @@ const handleControls = (e) => {
     setTimeout(() => {
       controls.removeChild(panel);
       gamearea.removeChild(sprite);
-      runGame(e.target.dataset.mode);
+      runGame(e.target.dataset.mode, null);
     }, "500");
 
     fadeoutElems(title, label, panel, sprite);
@@ -828,7 +931,10 @@ const handleProfileDeletion = () => {
 };
 
 loadPrevScores();
+checkSave();
 
 controls.addEventListener("mouseup", handleControls);
+notif_button_load.addEventListener("click", handleLoadGame);
+notif_button_del.addEventListener("click", handleDelSave);
 player_button.addEventListener("click", handleProfileChange);
 player_remove_button.addEventListener("click", handleProfileDeletion);
